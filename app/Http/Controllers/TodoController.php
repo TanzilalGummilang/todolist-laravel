@@ -30,7 +30,7 @@ class TodoController extends Controller
             return response()->view('todos.index', [
                 'title' => 'Todos',
                 'todos' => $this->todoService->getTodos(),
-                'error' => 'Todos is required'
+                'error' => 'Todo is required'
             ]);
         }
 
