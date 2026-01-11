@@ -28,19 +28,20 @@
         </div>
         <div class="row align-items-center g-lg-5 py-5">
             <div class="col-lg-7 text-center text-lg-start">
-                <h1 class="display-4 fw-bold lh-1 mb-3">Todos</h1>
+                <h1 class="display-4 fw-bold lh-1 mb-3">{{ $title }}</h1>
                 <p class="col-lg-10 fs-4">by <a target="_blank" href="https://www.programmerzamannow.com/">Programmer
                         Zaman
                         Now</a></p>
             </div>
             <div class="col-md-10 mx-auto col-lg-5">
-                <form class="p-4 p-md-5 border rounded-3 bg-light" method="post" action="/todos">
+                <form class="p-4 p-md-5 border rounded-3 bg-light" method="post" action="/todos/{{ $selectedTodo->id }}">
                     @csrf
+                    @method('PATCH')
                     <div class="form-floating mb-3">
-                        <input type="text" class="form-control" name="todo" placeholder="todo">
+                        <input type="text" class="form-control" name="todo" placeholder="todo" value="{{ $selectedTodo->todo }}">
                         <label for="todo">Todo</label>
                     </div>
-                    <button class="w-100 btn btn-lg btn-primary" type="submit">Add Todo</button>
+                    <button class="w-100 btn btn-lg btn-primary" type="submit">Edit Todo</button>
                 </form>
             </div>
         </div>
@@ -60,14 +61,8 @@
                             <tr>
                                 <th scope="row">{{ $loop->iteration }}</th>
                                 <td>{{ $item['todo'] }}</td>
-                                <td class="d-flex justify-content-end gap-2">
-                                    <a class="w-25 btn btn-lg btn-warning" href="/todos/{{ $item['id'] }}/edit">
-                                        Edit
-                                    </a>
-                                    <form action="/todos/{{ $item['id'] }}" method="post" class="w-25">
-                                        @csrf
-                                        <button class="w-100 btn btn-lg btn-danger" type="submit">Remove</button>
-                                    </form>
+                                <td>
+                                    <button class="w-100 btn btn-lg btn-danger invisible" type="submit" disabled>Remove</button>
                                 </td>
                             </tr>
                         @endforeach

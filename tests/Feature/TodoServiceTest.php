@@ -57,6 +57,24 @@ class TodoServiceTest extends TestCase
         Assert::assertArraySubset($expected, $this->todoService->getTodos());
     }
 
+    public function test_update_todo()
+    {
+        $this->todoService->saveTodo('Sleep');
+        $this->todoService->saveTodo('Eat Catfish Pecel');
+
+        $todos = $this->todoService->getTodos();
+        self::assertEquals(2, sizeof($todos));
+
+        $todoIds = array_map(function ($todo) {
+            return $todo['id'];
+        }, $todos);
+
+        $this->todoService->updateTodo($todoIds[0], 'Sleeping');
+
+        $todosAfterUpdate = $this->todoService->getTodos();
+        self::assertEquals('Sleeping', $todosAfterUpdate[0]['todo']);
+    }
+
     public function test_remove_todo()
     {
         $this->todoService->saveTodo('Sleep');

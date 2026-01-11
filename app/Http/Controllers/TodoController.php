@@ -39,6 +39,33 @@ class TodoController extends Controller
         return redirect()->action([TodoController::class, 'index']);
     }
 
+    public function edit(int $id)
+    {
+        return response()->view('todos.edit', [
+            'title' => 'Edit Todo',
+            'todos' => $this->todoService->getTodos(),
+            'selectedTodo' => $this->todoService->getTodoById($id)
+        ]);
+    }
+
+    public function update(Request $request, int $id)
+    {
+        $todo = $request->input('todo');
+
+        if (empty($todo)) {
+            return response()->view('todos.edit', [
+                'title' => 'Edit Todo',
+                'todos' => $this->todoService->getTodos(),
+                'selectedTodo' => $this->todoService->getTodoById($id),
+                'error' => 'Todo is required'
+            ]);
+        }
+
+        $this->todoService->updateTodo($id, $todo);
+
+        return redirect()->action([TodoController::class, 'index']);
+    }
+    
     public function removeTodo(string $id)
     {
         $this->todoService->removeTodo($id);

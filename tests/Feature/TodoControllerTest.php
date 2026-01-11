@@ -45,6 +45,41 @@ class TodoControllerTest extends TestCase
         ])->assertRedirect('/todos');
     }
 
+    public function test_edit_todo_page()
+    {
+        $this->seed(TodoSeeder::class);
+        $todos = Todo::query()->get();
+        
+        $this->withSession([
+            'user' => 'test@localhost'
+        ])->get('/todos/' . $todos[0]->id )
+            ->assertSeeText('Edit Todo')
+            ->assertSeeText('Learning Laravel');
+    }
+
+    public function test_update_todo_success()
+    {
+        $this->seed(TodoSeeder::class);
+        $todos = Todo::query()->get();
+        
+        $this->withSession([
+            'user' => 'test@localhost'
+        ])->post('/todos/' . $todos[0]->id, [
+            'todo' => 'Sleep All Day'
+        ])->assertRedirect('/todos');
+    }
+
+    public function test_update_todo_failed()
+    {
+        $this->seed(TodoSeeder::class);
+        $todos = Todo::query()->get();
+        
+        $this->withSession([
+            'user' => 'test@localhost'
+        ])->patch('/todos/' . $todos[0]->id, [])
+            ->assertSeeText('Todo is required');
+    }
+
     public function test_remove_todo()
     {
         $this->seed(TodoSeeder::class);

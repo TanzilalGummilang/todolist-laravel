@@ -17,9 +17,12 @@ Route::controller(UserController::class)->group(function () {
     Route::post('/logout', 'doLogout');
 });
 
-Route::controller(TodoController::class)
+Route::prefix('/todos')
+    ->controller(TodoController::class)
     ->middleware(OnlyMemberMiddleware::class)->group(function () {
-        Route::get('/todos', 'index');
-        Route::post('/todos', 'addTodo');
-        Route::post('/todos/{id}', 'removeTodo');
+        Route::get('/', 'index');
+        Route::post('/', 'addTodo');
+        Route::get('/{id}/edit', 'edit');
+        Route::patch('/{id}', 'update');
+        Route::post('/{id}', 'removeTodo');
     });
