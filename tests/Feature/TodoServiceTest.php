@@ -2,7 +2,10 @@
 
 namespace Tests\Feature;
 
+use App\Models\User;
 use App\Services\Interface\TodoServiceInterface;
+use Database\Seeders\TodoSeeder;
+use Database\Seeders\UserSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Facades\DB;
@@ -27,9 +30,12 @@ class TodoServiceTest extends TestCase
 
     public function test_save_todo()
     {
-        $this->todoService->saveTodo('Sleep');
+        $this->seed([UserSeeder::class]);
+        $user = User::all()->first();
 
-        $todos = $this->todoService->getTodos();
+        $this->todoService->saveTodo($user->id, 'Sleep');
+
+        $todos = $this->todoService->getTodos($user->id);
         foreach ($todos as $value) {
             self::assertEquals('Sleep', $value['todo']);
         }
@@ -37,11 +43,14 @@ class TodoServiceTest extends TestCase
 
     public function test_get_todos_empty()
     {
-        self::assertEquals([], $this->todoService->getTodos());
+        self::assertEquals([], $this->todoService->getAllTodos());
     }
 
     public function test_get_todos_not_empty()
     {
+        $this->seed([UserSeeder::class]);
+        $user = User::all()->first();
+
         $expected = [
             [
                 'todo' => 'Sleep'
@@ -51,18 +60,21 @@ class TodoServiceTest extends TestCase
             ]
         ];
 
-        $this->todoService->saveTodo('Sleep');
-        $this->todoService->saveTodo('Eat Catfish Pecel');
+        $this->todoService->saveTodo($user->id, 'Sleep');
+        $this->todoService->saveTodo($user->id, 'Eat Catfish Pecel');
 
-        Assert::assertArraySubset($expected, $this->todoService->getTodos());
+        Assert::assertArraySubset($expected, $this->todoService->getAllTodos());
     }
 
     public function test_update_todo()
     {
-        $this->todoService->saveTodo('Sleep');
-        $this->todoService->saveTodo('Eat Catfish Pecel');
+        $this->seed([UserSeeder::class]);
+        $user = User::all()->first();
+        
+        $this->todoService->saveTodo($user->id, 'Sleep');
+        $this->todoService->saveTodo($user->id, 'Eat Catfish Pecel');
 
-        $todos = $this->todoService->getTodos();
+        $todos = $this->todoService->getAllTodos();
         self::assertEquals(2, sizeof($todos));
 
         $todoIds = array_map(function ($todo) {
@@ -71,16 +83,19 @@ class TodoServiceTest extends TestCase
 
         $this->todoService->updateTodo($todoIds[0], 'Sleeping');
 
-        $todosAfterUpdate = $this->todoService->getTodos();
+        $todosAfterUpdate = $this->todoService->getAllTodos();
         self::assertEquals('Sleeping', $todosAfterUpdate[0]['todo']);
     }
 
     public function test_remove_todo()
     {
-        $this->todoService->saveTodo('Sleep');
-        $this->todoService->saveTodo('Eat Catfish Pecel');
+        $this->seed([UserSeeder::class]);
+        $user = User::all()->first();
+        
+        $this->todoService->saveTodo($user->id, 'Sleep');
+        $this->todoService->saveTodo($user->id, 'Eat Catfish Pecel');
 
-        $todos = $this->todoService->getTodos();
+        $todos = $this->todoService->getAllTodos();
         self::assertEquals(2, sizeof($todos));
 
         $todoIds = array_map(function ($todo) {
@@ -89,7 +104,7 @@ class TodoServiceTest extends TestCase
 
         $this->todoService->removeTodo($todoIds[0]);
 
-        $todosAfterDeletion = $this->todoService->getTodos();
+        $todosAfterDeletion = $this->todoService->getAllTodos();
         self::assertEquals(1, sizeof($todosAfterDeletion));
         self::assertNotEquals(0, sizeof($todosAfterDeletion));
         self::assertNotEquals(2, sizeof($todosAfterDeletion));

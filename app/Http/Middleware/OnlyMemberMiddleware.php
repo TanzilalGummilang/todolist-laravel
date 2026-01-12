@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 
 class OnlyMemberMiddleware
@@ -15,10 +16,10 @@ class OnlyMemberMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if ($request->session()->exists('user')) {
-            return $next($request);
+        if (!Auth::check()) {
+            return redirect('/login');
         }
 
-        return redirect('/');
+        return $next($request);
     }
 }

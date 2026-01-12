@@ -3,7 +3,9 @@
 namespace Tests\Feature;
 
 use App\Models\Todo;
+use App\Models\User;
 use Database\Seeders\TodoSeeder;
+use Database\Seeders\UserSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Facades\DB;
@@ -19,75 +21,76 @@ class TodoControllerTest extends TestCase
 
     public function test_todo_page()
     {
-        $this->seed(TodoSeeder::class);
+        $this->seed([UserSeeder::class, TodoSeeder::class]);
+        $user = User::all()->first();
 
-        $this->withSession([
-            'user' => 'test@localhost'
-        ])->get('/todos')
-            ->assertSeeText('Learning Laravel')
-            ->assertSeeText('Learning Vue');
+        $this->actingAs($user)->get('/todos')
+            ->assertSeeText('Learning Laravel');
     }
 
     public function test_add_todo_failed()
     {
-        $this->withSession([
-            'user' => 'test@localhost'
-        ])->post('/todos', [])
+        $this->seed([UserSeeder::class]);
+        $user = User::all()->first();
+
+        $this->actingAs($user)->post('/todos', [])
             ->assertSeeText('Todo is required');
     }
 
     public function test_add_todo_success()
     {
-        $this->withSession([
-            'user' => 'test@localhost'
-        ])->post('/todos', [
-            'todo' => 'Sleep'
+        $this->seed([UserSeeder::class]);
+        $user = User::all()->first();
+
+        $this->actingAs($user)->post('/todos', [
+            'todo' => 'Sleep',
+            'user_id' => $user->id
         ])->assertRedirect('/todos');
     }
 
     public function test_edit_todo_page()
     {
-        $this->seed(TodoSeeder::class);
+        $this->seed([UserSeeder::class, TodoSeeder::class]);
+        $user = User::all()->first();
         $todos = Todo::query()->get();
-        
-        $this->withSession([
-            'user' => 'test@localhost'
-        ])->get('/todos/' . $todos[0]->id )
+
+        $this->actingAs($user)
+            ->get('/todos/' . $todos[0]->id)
             ->assertSeeText('Edit Todo')
             ->assertSeeText('Learning Laravel');
     }
 
     public function test_update_todo_success()
     {
-        $this->seed(TodoSeeder::class);
+        $this->seed([UserSeeder::class, TodoSeeder::class]);
+        $user = User::all()->first();
         $todos = Todo::query()->get();
-        
-        $this->withSession([
-            'user' => 'test@localhost'
-        ])->post('/todos/' . $todos[0]->id, [
-            'todo' => 'Sleep All Day'
-        ])->assertRedirect('/todos');
+
+        $this->actingAs($user)
+            ->post('/todos/' . $todos[0]->id, [
+                'todo' => 'Sleep All Day'
+            ])->assertRedirect('/todos');
     }
 
     public function test_update_todo_failed()
     {
-        $this->seed(TodoSeeder::class);
+        $this->seed([UserSeeder::class, TodoSeeder::class]);
+        $user = User::all()->first();
         $todos = Todo::query()->get();
-        
-        $this->withSession([
-            'user' => 'test@localhost'
-        ])->patch('/todos/' . $todos[0]->id, [])
+
+        $this->actingAs($user)
+            ->patch('/todos/' . $todos[0]->id, [])
             ->assertSeeText('Todo is required');
     }
 
     public function test_remove_todo()
     {
-        $this->seed(TodoSeeder::class);
+        $this->seed([UserSeeder::class, TodoSeeder::class]);
+        $user = User::all()->first();
         $todos = Todo::query()->get();
-        
-        $this->withSession([
-            'user' => 'test@localhost'
-        ])->post('/todos/' . $todos[0]->id )
+
+        $this->actingAs($user)
+            ->post('/todos/' . $todos[0]->id)
             ->assertRedirect('/todos');
     }
 }

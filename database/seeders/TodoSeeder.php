@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Todo;
+use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -13,12 +14,27 @@ class TodoSeeder extends Seeder
      */
     public function run(): void
     {
-        $todo = new Todo();
-        $todo->todo = "Learning Laravel";
-        $todo->save();
+        $datasets = [
+            'test@localhost' => ['Learning Laravel', 'Learning Eloquent', 'Learning Seeder'],
+            'second@localhost' => ['Playing Game', 'Watching Movie', 'Aerobics'],
+        ];
 
-        $todo = new Todo();
-        $todo->todo = "Learning Vue";
-        $todo->save();
+        foreach ($datasets as $email => $todos) {
+            $user = User::where('email', $email)->first();
+
+            if ($user) {
+                $data = [];
+                foreach ($todos as $todoText) {
+                    $data[] = [
+                        'user_id' => $user->id,
+                        'todo' => $todoText,
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ];
+                }
+
+                Todo::insert($data);
+            }
+        }
     }
 }

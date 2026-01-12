@@ -20,9 +20,9 @@ Route::controller(UserController::class)->group(function () {
 Route::prefix('/todos')
     ->controller(TodoController::class)
     ->middleware(OnlyMemberMiddleware::class)->group(function () {
-        Route::get('/', 'index');
-        Route::post('/', 'addTodo');
+        Route::get('/', 'index')->name('todos.index');
         Route::get('/{id}/edit', 'edit');
+        Route::post('/', 'addTodo');
         Route::patch('/{id}', 'update');
         Route::post('/{id}', 'removeTodo');
     });

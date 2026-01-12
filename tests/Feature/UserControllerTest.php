@@ -23,7 +23,7 @@ class UserControllerTest extends TestCase
             ->assertSeeText("Login");
     }
 
-    public function test_Login_page_for_member()
+    public function test_login_page_for_member()
     {
         $this->withSession([
             "user" => "test@localhost"

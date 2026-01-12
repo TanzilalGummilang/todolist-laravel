@@ -8,15 +8,17 @@ use Illuminate\Support\Facades\Session;
 
 class TodoService implements TodoServiceInterface
 {
-    public function saveTodo(string $todo): void
+    public function saveTodo(int $userId, string $todo): void
     {
         $todo = new Todo([
+            "user_id" => $userId,
             "todo" => $todo
         ]);
+
         $todo->save();
     }
 
-    public function getTodos(): array
+    public function getAllTodos(): array
     {
         return Todo::query()->get()->toArray();
     }
@@ -24,6 +26,11 @@ class TodoService implements TodoServiceInterface
     public function getTodoById(int $id): Todo
     {
         return Todo::query()->find($id);
+    }
+
+    public function getTodos(int $userId): array
+    {
+        return Todo::query()->where('user_id', $userId)->get()->toArray();
     }
 
     public function updateTodo(int $id, string $todo): void
